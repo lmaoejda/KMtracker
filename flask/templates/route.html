@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Ruta #{{ route['id'] }} · KMtracker{% endblock %}
+{% block body %}
+<main class="page">
+  <header class="page__sub">
+    <div>
+      <p class="label">{{ 'Seguimiento GPS' if route['kind'] == 'tracking' else 'Ruta manual' }} &middot; {{ route['created_at'] }}</p>
+      <h1>Ruta #{{ route['id'] }}</h1>
+    </div>
+    <div class="page__sub-figures">
+      <div><p class="label">Distancia</p><p class="value value--sm">{{ '%.2f'|format(route['distance_m'] / 1000) }}<span class="unit">km</span></p></div>
+      <div><p class="label">Puntos</p><p class="value value--sm">{{ route['points']|length }}</p></div>
+      <div><p class="label">Duración</p><p class="value value--sm">{% if route['duration_s'] %}{{ route['duration_s'] // 60 }}:{{ '%02d'|format(route['duration_s'] % 60) }}{% else %}—{% endif %}</p></div>
+    </div>
+    <a class="btn ghost" href="{{ url_for('stats') }}">&larr; Volver</a>
+  </header>
+
+  <div class="mapwrap mapwrap--page">
+    <div id="routeMap" aria-label="Recorrido guardado"></div>
+    <p class="map__attr">&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a></p>
+  </div>
+
+  <section class="ledger ledger--page">
+    <p class="label">Coordenadas registradas</p>
+    <ol id="routeCoords">
+      {% for p in route['points'] %}
+        <li class="mono">{{ '%.5f'|format(p[0]) }}, {{ '%.5f'|format(p[1]) }}</li>
+      {% endfor %}
+    </ol>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var pts = {{ route['points']|tojson }};
+  var map = L.map('routeMap', { zoomControl: true, dragging: true, scrollWheelZoom: false })
+    .setView([pts[0][0], pts[0][1]], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+  var line = L.polyline(pts, { color: '#63E6BE', weight: 4, opacity: 0.9 }).addTo(map);
+  L.circleMarker(pts[0], { radius: 7, color: '#F2A93B', weight: 3, fillColor: '#0B100E', fillOpacity: 1 }).addTo(map);
+  L.circleMarker(pts[pts.length - 1], { radius: 7, color: '#63E6BE', weight: 3, fillColor: '#0B100E', fillOpacity: 1 }).addTo(map);
+  map.fitBounds(line.getBounds().pad(0.15));
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Estadísticas · KMtracker{% endblock %}
+{% block body %}
+<main class="page">
+  <header class="page__hero" style="background-image:url('{{ url_for('static', filename='img/trail.jpg') }}')">
+    <p class="label">Bitácora de {{ user['email'] }}</p>
+    <h1>Estadísticas</h1>
+  </header>
+
+  <section class="stats">
+    <div class="stat">
+      <p class="label">Rutas guardadas</p>
+      <p class="value value--sm">{{ total_routes }}</p>
+    </div>
+    <div class="stat">
+      <p class="label">Kilómetros históricos</p>
+      <p class="value value--sm">{{ '%.2f'|format(total_km) }}<span class="unit">km</span></p>
+    </div>
+    <div class="stat">
+      <p class="label">Distancia media / ruta</p>
+      <p class="value value--sm">
+        {{ '%.2f'|format(total_km / total_routes if total_routes else 0) }}<span class="unit">km</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="table">
+    <div class="table__head">
+      <p class="label">Fecha</p>
+      <p class="label">Tipo</p>
+      <p class="label">Puntos</p>
+      <p class="label">Duración</p>
+      <p class="label num">Distancia</p>
+      <p class="label">Mapa</p>
+    </div>
+
+    {% if routes %}
+      {% for r in routes %}
+      <a class="table__row" href="{{ url_for('route_detail', route_id=r['id']) }}">
+        <p class="mono">{{ r['created_at'] }}</p>
+        <p><span class="tag {{ r['kind'] }}">{{ 'GPS' if r['kind'] == 'tracking' else 'Manual' }}</span></p>
+        <p class="mono">{{ r['points']|length }}</p>
+        <p class="mono">{% if r['duration_s'] %}{{ (r['duration_s'] // 60) }}:{{ '%02d'|format(r['duration_s'] % 60) }}{% else %}—{% endif %}</p>
+        <p class="mono num strong">{{ '%.2f'|format(r['distance_m'] / 1000) }} km</p>
+        <p class="arrow">Ver &rarr;</p>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="table__empty">
+        <p>Todavía no has guardado ninguna ruta.</p>
+        <a class="btn accent" href="{{ url_for('index') }}">Marcar la primera ruta</a>
+      </div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

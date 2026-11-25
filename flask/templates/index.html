@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Mapa · KMtracker{% endblock %}
+{% block body %}
+<main class="tracker" id="tracker">
+  <aside class="rail">
+    <div class="mode" role="tablist" aria-label="Modo de registro">
+      <button type="button" class="mode__btn is-active" id="modeManual" role="tab" aria-selected="true">Manual</button>
+      <button type="button" class="mode__btn" id="modeGps" role="tab" aria-selected="false">GPS en vivo</button>
+    </div>
+
+    <section class="readouts">
+      <div class="readout">
+        <p class="label">Distancia total</p>
+        <p class="value" id="totalKm">0.00<span class="unit">km</span></p>
+      </div>
+      <div class="readout--split">
+        <div>
+          <p class="label">Último tramo</p>
+          <p class="value value--sm" id="lastKm">0.00<span class="unit">km</span></p>
+        </div>
+        <div>
+          <p class="label">Puntos</p>
+          <p class="value value--sm" id="pointCount">0</p>
+        </div>
+      </div>
+      <div class="readout--split only-gps">
+        <div>
+          <p class="label">Tiempo</p>
+          <p class="value value--sm" id="elapsed">00:00</p>
+        </div>
+        <div>
+          <p class="label">Vel. media</p>
+          <p class="value value--sm" id="avgSpeed">0.0<span class="unit">km/h</span></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="status" id="gpsStatus" role="status" hidden></div>
+
+    <div class="actions">
+      <button type="button" class="btn primary big" id="btnStart" hidden>INICIAR</button>
+      <button type="button" class="btn stop big" id="btnStop" hidden>DETENER</button>
+      <div class="actions__row">
+        <button type="button" class="btn" id="btnClear">Limpiar ruta</button>
+        <button type="button" class="btn accent" id="btnSave" disabled>Guardar ruta</button>
+      </div>
+    </div>
+
+    <section class="ledger">
+      <div class="ledger__head">
+        <p class="label">Coordenadas</p>
+        <p class="label" id="ledgerCount">0 pts</p>
+      </div>
+      <ol id="coordList"><li class="ledger__empty">Toca el mapa para marcar el primer punto.</li></ol>
+    </section>
+  </aside>
+
+  <div class="mapwrap">
+    <div id="map" aria-label="Mapa de la ruta"></div>
+    <p class="map__badge" id="modeBadge">MODO MANUAL</p>
+    <p class="map__attr">&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a></p>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>window.TRACK_CFG = {{ cfg|tojson }};</script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tracking.js') }}"></script>
+{% endblock %}

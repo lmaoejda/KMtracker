@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}No encontrado · KMtracker{% endblock %}
+{% block body %}
+<main class="page center">
+  <p class="label">Error 404</p>
+  <h1>Esta ruta no existe</h1>
+  <p class="muted">Puede que la hayas borrado o que pertenezca a otra cuenta.</p>
+  <a class="btn accent" href="{{ url_for('index') }}">Volver al mapa</a>
+</main>
+{% endblock %}
